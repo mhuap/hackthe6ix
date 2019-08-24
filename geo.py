@@ -3,7 +3,7 @@ import csv
 import requests
 import json
 import statistics
-import utm
+
 
 geolocator = Nominatim(user_agent="specify_your_app_name_here")
 
@@ -74,12 +74,11 @@ with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
     d['Scarborough North'] = round(statistics.mean([d['Malvern'], d['Agincourt South-Malvern West'], d['Rouge'], d['Milliken'], d['Agincourt North']]), 2)
 
 def process(address, rented, type, price, description):
+    
     location = geolocator.geocode(address, timeout=30)
     
-    if 'house' in type:
-        house = True
-    else:
-        house = False
+    house = True if 'house' in type else False
+    security = True if 'security' in description.lower() else False
 
     addressList = location.address.split(', ')
     fireStationCount = 0
@@ -97,7 +96,8 @@ def process(address, rented, type, price, description):
         risk *= 1.37
     if house:
         risk *= 1.42
-
+    if security:
+        risk *= (2/3)
     risk = round(risk, 2)
     print(risk)
     housemin = {}
@@ -155,7 +155,7 @@ def process(address, rented, type, price, description):
             minPremium = apartmentmin['MAX']
         premium = minPremium + diff * risk/5 - diff * (fireStationCount - 1)/6
 
-
+    
     premium = round(premium, 2)
     info = {
         'address': address,
@@ -165,5 +165,6 @@ def process(address, rented, type, price, description):
         'risk': risk,
         'premium': premium,
         'description':description
+        'security': security
     }
     return info
