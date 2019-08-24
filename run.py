@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import sys
+import geo
 
 from bs4 import BeautifulSoup
 import requests
@@ -24,16 +25,15 @@ def do_scrape(url):
     info['type'] = type.capitalize()
     info['description'] = description
 
-    return info
+    address = address1 + ", " + address2
+    if " - " in address:
+        address = address[address.index(' - ') + 1:]
 
-def calc_risk(info):
-    risk = breakins/76
+    address = address[:address.index(',') + 1] + ' Toronto, ON'
+    price = int(price.replace('$', '').replace(',', ''))
+    house = str(type)
 
-    if rented:
-       risk *= 1.37
-    if house:
-       risk *= 1.42
-    return risk
+    return geo.process(address, rented, house, price)
 
 @app.route('/')
 def home():
