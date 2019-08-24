@@ -15,16 +15,18 @@ def do_scrape(url):
     price_nums = int("".join(filter(str.isdigit, price)))
     rented = price_nums < 10000
     type = soup.find_all("span", class_="classifier")[3].get_text()
+    description = soup.select('.property-description p.content')[0].get_text()
 
     info = {}
     info['address'] = address1 + ", " + address2
     info['price'] = price
     info['rented'] = "Rent" if rented else "Own"
     info['type'] = type.capitalize()
+    info['description'] = description
 
     return info
 
-def calc_risk(info){
+def calc_risk(info):
     risk = breakins/76
 
     if rented:
@@ -32,7 +34,6 @@ def calc_risk(info){
     if house:
        risk *= 1.42
     return risk
-}
 
 @app.route('/')
 def home():

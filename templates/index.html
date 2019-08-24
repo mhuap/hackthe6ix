@@ -6,12 +6,17 @@
     <link rel='stylesheet' href='{{ url_for('static', filename='style.css') }}'>
 </head>
 <body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-center">
+      <a class="navbar-brand" href="/">Real Estate Risk Assessment</a>
+    </nav>
     <div id='home'>
-      <h1>Enter url</h1>
+      <h1>Be informed on the risks you're taking.</h1>
+      <p>Learn about your prospective place of residence. Enter the property listing url below and receive a personalized risk score and estimated insurance premium.</p>
       <form action='/scrape' method="post">
         <input type='text' name='url' class='form-control' value='www.example.com/property'>
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
+      <img src={{url_for('static', filename='undraw.png')}}/>
     </div>
 </body>
 </html>
