@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import sys
+import geo
 
 from bs4 import BeautifulSoup
 import requests
@@ -16,15 +17,18 @@ def do_scrape(url):
     rented = price_nums < 10000
     type = soup.find_all("span", class_="classifier")[3].get_text()
 
-    info = {}
-    info['address'] = address1 + ", " + address2
-    info['price'] = price
-    info['rented'] = "Rent" if rented else "Own"
-    info['type'] = type.capitalize()
+    
+    address = address1 + ", " + address2
+    if " - " in address:
+        address = address[address.index(' - ') + 1:]
 
-    return info
+    address = address[:address.index(',') + 1] + ' Toronto, ON'
+    price = int(price.replace('$', '').replace(',', ''))
+    house = str(type)
 
-def calc_risk(info){
+    return geo.process(address, rented, house, price)
+
+def calc_risk(info):
     risk = breakins/76
 
     if rented:
@@ -32,7 +36,7 @@ def calc_risk(info){
     if house:
        risk *= 1.42
     return risk
-}
+
 
 @app.route('/')
 def home():
