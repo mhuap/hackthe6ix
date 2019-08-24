@@ -8,31 +8,31 @@ import utm
 geolocator = Nominatim(user_agent="specify_your_app_name_here")
 
 fireStations = {}
-fireStations['Etobicoke North'] = 0
-fireStations['Etobicoke Centre'] = 0
-fireStations['Etobicoke-Lakeshore'] = 0
-fireStations['Parkdale-High Park'] = 0
-fireStations['York South-Weston'] = 0
-fireStations['York Centre'] = 0
-fireStations['Humber River-Black Creek'] = 0
-fireStations['Eglinton-Lawrence'] = 0
-fireStations['Davenport'] = 0
-fireStations['Spadina-Fort York'] = 0
-fireStations['Scarborough-Rouge Park'] = 0
-fireStations['University-Rosedale'] = 0
-fireStations['Toronto-St. Paul\'s'] = 0
-fireStations['Toronto Centre'] = 0
-fireStations['Scarborough-Guildwood'] = 0
-fireStations['Toronto-Danforth'] = 0
-fireStations['Don Valley West'] = 0
-fireStations['Don Valley East'] = 0
-fireStations['Don Valley North'] = 0
-fireStations['Willowdale'] = 0
-fireStations['Beaches-East York'] = 0
-fireStations['Scarborough Southwest'] = 0
-fireStations['Scarborough Centre'] = 0
-fireStations['Scarborough-Agincourt'] = 0
-fireStations['Scarborough North'] = 0
+fireStations['Etobicoke North'] = 4
+fireStations['Etobicoke Centre'] = 3
+fireStations['Etobicoke-Lakeshore'] = 5
+fireStations['Parkdale-High Park'] = 5
+fireStations['York South-Weston'] = 3
+fireStations['York Centre'] = 3
+fireStations['Humber River-Black Creek'] = 4
+fireStations['Eglinton-Lawrence'] = 2
+fireStations['Davenport'] = 3
+fireStations['Spadina-Fort York'] = 6
+fireStations['Scarborough-Rouge Park'] = 3
+fireStations['University-Rosedale'] = 4
+fireStations['Toronto-St. Paul\'s'] = 3
+fireStations['Toronto Centre'] = 3
+fireStations['Scarborough-Guildwood'] = 2
+fireStations['Toronto-Danforth'] = 4
+fireStations['Don Valley West'] = 4
+fireStations['Don Valley East'] = 3
+fireStations['Don Valley North'] = 4
+fireStations['Willowdale'] = 1
+fireStations['Beaches-East York'] = 3
+fireStations['Scarborough Southwest'] = 3
+fireStations['Scarborough Centre'] = 2
+fireStations['Scarborough-Agincourt'] = 2
+fireStations['Scarborough North'] = 4
 
 d = {}
  
@@ -73,28 +73,8 @@ with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
     d['Scarborough-Agincourt'] = round(statistics.mean([d['Steeles'], d['L\'Amoreaux'], d['Tam O\'Shanter-Sullivan']]), 2)
     d['Scarborough North'] = round(statistics.mean([d['Malvern'], d['Agincourt South-Malvern West'], d['Rouge'], d['Milliken'], d['Agincourt North']]), 2)
 
-def getFireStations():
-    with open('fire station x_y.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            east = float(row[1])
-            north = float(row[2])
-            lat, lon = utm.to_latlon(east, north, 17, 'T')
-            lat = str(lat)
-            lon = str(lon)
-            location = geolocator.reverse(lat + ", " + lon)
-            address = location.address.split(', ')
-            for add in address:
-                add = add.replace('—', '-')
-                if add in fireStations.keys():
-                    fireStations[add] += 1
-            line_count += 1
-
 def process(address, rented, type, price):
     location = geolocator.geocode(address, timeout=30)
-    
-    getFireStations()
     
     if 'house' in type:
         house = True
