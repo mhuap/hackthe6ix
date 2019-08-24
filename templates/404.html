@@ -10,12 +10,9 @@
       <a class="navbar-brand" href="/">Real Estate Risk Assessment</a>
     </nav>
     <div id='home'>
-      <h1>Be informed on the risks you're taking.</h1>
-      <p>Learn about your prospective place of residence. Enter the property listing url below and receive a personalized <strong>risk score</strong> and estimated <strong>insurance premium</strong>.</p>
-      <form action='/scrape' method="post">
-        <input type='text' name='url' class='form-control' placeholder='www.example.com/property'>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
+      <h1>Oops! Invalid Link</h1>
+      <p>For the time being, we're only able to process valid urls of property listings from remax.com. We apologize for any inconvience.</p>
+      <a href='/' class='text-primary'>Try again</a>
       <img src={{url_for('static', filename='undraw.png')}}/>
     </div>
 </body>

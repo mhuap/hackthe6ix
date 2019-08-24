@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect
 import sys
 import geo
 
@@ -8,7 +8,7 @@ import requests
 app = Flask(__name__)
 
 def do_scrape(url):
-    page = requests.get(url)
+    page = requests.get(url, verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
     address1 = soup.h1.get_text()
     address2 = soup.h5.get_text()
@@ -16,8 +16,15 @@ def do_scrape(url):
     price_nums = int("".join(filter(str.isdigit, price)))
     rented = price_nums < 10000
     type = soup.find_all("span", class_="classifier")[3].get_text()
+    description = soup.select('.property-description p.content')[0].get_text()
 
-    
+    info = {}
+    info['address'] = address1 + ", " + address2
+    info['price'] = price
+    info['rented'] = "Rent" if rented else "Own"
+    info['type'] = type.capitalize()
+    info['description'] = description
+
     address = address1 + ", " + address2
     if " - " in address:
         address = address[address.index(' - ') + 1:]
@@ -26,17 +33,7 @@ def do_scrape(url):
     price = int(price.replace('$', '').replace(',', ''))
     house = str(type)
 
-    return geo.process(address, rented, house, price)
-
-def calc_risk(info):
-    risk = breakins/76
-
-    if rented:
-       risk *= 1.37
-    if house:
-       risk *= 1.42
-    return risk
-
+    return geo.process(address, rented, house, price, description)
 
 @app.route('/')
 def home():
@@ -45,9 +42,13 @@ def home():
 @app.route('/scrape', methods=['POST', 'GET'])
 def result():
     if request.method == 'POST':
-        return render_template('result.html', **do_scrape(request.form['url']))
+        url = request.form['url']
+        if 'remax.ca' in url:
+            return render_template('result.html', **do_scrape(url))
+        else:
+            return render_template('404.html'), 404
     else:
-        return "Nope"
+        return redirect("http://127.0.0.1:5000/", code=302)
 
 if __name__ == '__main__':
  app.run()
