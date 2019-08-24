@@ -34,42 +34,18 @@ fireStations['Scarborough Centre'] = 0
 fireStations['Scarborough-Agincourt'] = 0
 fireStations['Scarborough North'] = 0
 
-def getFireStations():
-    with open('fire station x_y.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            east = float(row[1])
-            north = float(row[2])
-            lat, lon = utm.to_latlon(east, north, 17, 'T')
-            lat = str(lat)
-            lon = str(lon)
-            location = geolocator.reverse(lat + ", " + lon)
-            address = location.address.split(', ')
-            for add in address:
-                add = add.replace('—', '-')
-                if add in fireStations.keys():
-                    fireStations[add] += 1
-            line_count += 1
-
-def process(address, rented, house, price):
-    location = geolocator.geocode(address)
-    
-    getFireStations()
-   
-    addressList = location.address.split(', ')
-    d = {}
+d = {}
  
-    with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                d[row[1]] = float(row[26])
-                """ print(f'\t{row[1]} is {row[26]}.') """
-                line_count += 1
+with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            line_count += 1
+        else:
+            d[row[1]] = float(row[26])
+            """ print(f'\t{row[1]} is {row[26]}.') """
+            line_count += 1
     
     d['Etobicoke North'] = round(statistics.mean([d['Mount Olive-Silverstone-Jamestown'], d['West Humber-Clairville'], d['Thistletown-Beaumond Heights'], d['Rexdale-Kipling'], d['Elms-Old Rexdale'], d['Kingsview Village-The Westway']]), 2)
     d['Etobicoke Centre'] = round(statistics.mean([d['Willowridge-Martingrove-Richview'], d['Humber Heights-Westmount'], d['Edenbridge-Humber Valley'], d['Princess-Rosethorn'], d['Eringate-Centennial-West Deane'], d['Markland Wood'], d['Etobicoke West Mall'], d['Islington-City Centre West']]), 2)
@@ -97,8 +73,38 @@ def process(address, rented, house, price):
     d['Scarborough-Agincourt'] = round(statistics.mean([d['Steeles'], d['L\'Amoreaux'], d['Tam O\'Shanter-Sullivan']]), 2)
     d['Scarborough North'] = round(statistics.mean([d['Malvern'], d['Agincourt South-Malvern West'], d['Rouge'], d['Milliken'], d['Agincourt North']]), 2)
 
+def getFireStations():
+    with open('fire station x_y.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            east = float(row[1])
+            north = float(row[2])
+            lat, lon = utm.to_latlon(east, north, 17, 'T')
+            lat = str(lat)
+            lon = str(lon)
+            location = geolocator.reverse(lat + ", " + lon)
+            address = location.address.split(', ')
+            for add in address:
+                add = add.replace('—', '-')
+                if add in fireStations.keys():
+                    fireStations[add] += 1
+            line_count += 1
+
+def process(address, rented, type, price):
+    location = geolocator.geocode(address, timeout=30)
+    
+    getFireStations()
+    
+    if 'house' in type:
+        house = True
+    else:
+        house = False
+
+    addressList = location.address.split(', ')
     fireStationCount = 0
     breakins = 0
+
     for add in addressList:
         add = add.replace('—', '-')
         if add in d.keys():
@@ -171,4 +177,12 @@ def process(address, rented, house, price):
 
 
     premium = round(premium, 2)
-    return risk, premium
+    info = {
+        'address': address,
+        'price': price,
+        'rented': rented,
+        'type': type,
+        'risk': risk,
+        'premium': premium
+    }
+    return info
