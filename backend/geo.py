@@ -3,12 +3,59 @@ import csv
 import requests
 import json
 import statistics
+import utm
 
+geolocator = Nominatim(user_agent="specify_your_app_name_here")
+
+fireStations = {}
+fireStations['Etobicoke North'] = 0
+fireStations['Etobicoke Centre'] = 0
+fireStations['Etobicoke-Lakeshore'] = 0
+fireStations['Parkdale-High Park'] = 0
+fireStations['York South-Weston'] = 0
+fireStations['York Centre'] = 0
+fireStations['Humber River-Black Creek'] = 0
+fireStations['Eglinton-Lawrence'] = 0
+fireStations['Davenport'] = 0
+fireStations['Spadina-Fort York'] = 0
+fireStations['Scarborough-Rouge Park'] = 0
+fireStations['University-Rosedale'] = 0
+fireStations['Toronto-St. Paul\'s'] = 0
+fireStations['Toronto Centre'] = 0
+fireStations['Scarborough-Guildwood'] = 0
+fireStations['Toronto-Danforth'] = 0
+fireStations['Don Valley West'] = 0
+fireStations['Don Valley East'] = 0
+fireStations['Don Valley North'] = 0
+fireStations['Willowdale'] = 0
+fireStations['Beaches-East York'] = 0
+fireStations['Scarborough Southwest'] = 0
+fireStations['Scarborough Centre'] = 0
+fireStations['Scarborough-Agincourt'] = 0
+fireStations['Scarborough North'] = 0
+
+def getFireStations():
+    with open('fire station x_y.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        line_count = 0
+        for row in csv_reader:
+            east = float(row[1])
+            north = float(row[2])
+            lat, lon = utm.to_latlon(east, north, 17, 'T')
+            lat = str(lat)
+            lon = str(lon)
+            location = geolocator.reverse(lat + ", " + lon)
+            address = location.address.split(', ')
+            for add in address:
+                add = add.replace('—', '-')
+                if add in fireStations.keys():
+                    fireStations[add] += 1
+            line_count += 1
 
 def process(address, rented, house, price):
-    geolocator = Nominatim(user_agent="specify_your_app_name_here")
     location = geolocator.geocode(address)
     
+    getFireStations()
    
     addressList = location.address.split(', ')
     d = {}
@@ -36,7 +83,7 @@ def process(address, rented, house, price):
     d['Spadina-Fort York'] = round(statistics.mean([d['Niagara'], d['Waterfront Communities-The Island'], d['Kensington-Chinatown'], d['Bay Street Corridor'], d['Trinity-Bellwoods']]), 2)
     d['Scarborough-Rouge Park'] = round(statistics.mean([d['West Hill'], d['Centennial Scarborough'], d['Rouge'], d['Highland Creek'], d['Malvern']]), 2)
     d['University-Rosedale'] = round(statistics.mean([d['Bay Street Corridor'], d['Kensington-Chinatown'], d['University'], d['Palmerston-Little Italy'], d['Annex'], d['Rosedale-Moore Park']]), 2)
-    d['Toronto-St Paul’s'] = round(statistics.mean([d['Wychwood'], d['Casa Loma'], d['Humewood-Cedarvale'], d['Oakwood Village'], d['Forest Hill South'], d['Yonge-St.Clair'], d['Yonge-Eglinton'], d['Mount Pleasant West']]), 2)
+    d['Toronto-St. Paul\'s'] = round(statistics.mean([d['Wychwood'], d['Casa Loma'], d['Humewood-Cedarvale'], d['Oakwood Village'], d['Forest Hill South'], d['Yonge-St.Clair'], d['Yonge-Eglinton'], d['Mount Pleasant West']]), 2)
     d['Toronto Centre'] = round(statistics.mean([d['Church-Yonge Corridor'], d['Moss Park'], d['Regent Park'], d['Cabbagetown-South St.James Town'], d['North St.James Town']]), 2)
     d['Scarborough-Guildwood'] = round(statistics.mean([d['Guildwood'], d['Scarborough Village'], d['Woburn'], d['West Hill'], d['Morningside']]), 2)
     d['Toronto-Danforth'] = round(statistics.mean([d['Old East York'], d['Danforth East York'], d['Danforth'], d['Greenwood-Coxwell'], d['South Riverdale'], d['North Riverdale'], d['Blake-Jones'], d['Playter Estates-Danforth'], d['Broadview North']]), 2)
@@ -46,14 +93,18 @@ def process(address, rented, house, price):
     d['Willowdale'] = round(statistics.mean([d['Willowdale East'], d['Willowdale West'], d['Lansing-Westgate'], d['Newtonbrook West'], d['Newtonbrook East']]), 2)
     d['Beaches-East York'] = round(statistics.mean([d['The Beaches'], d['East End-Danforth'], d['O\'Connor-Parkview'], d['Taylor-Massey'], d['Woodbine-Lumsden'], d['South Riverdale'], d['Woodbine Corridor'], d['Danforth'], d['Danforth East York'], d['Old East York']]), 2)
     d['Scarborough Southwest'] = round(statistics.mean([d['Scarborough Village'], d['Cliffcrest'], d['Kennedy Park'], d['Birchcliffe-Cliffside'], d['Oakridge'], d['Clairlea-Birchmount']]), 2)
-    d['Scarborough Center'] = round(statistics.mean([d['Dorset Park'], d['Bendale'], d['Eglinton East'], d['Ionview'], d['Wexford/Maryvale']]), 2)
+    d['Scarborough Centre'] = round(statistics.mean([d['Dorset Park'], d['Bendale'], d['Eglinton East'], d['Ionview'], d['Wexford/Maryvale']]), 2)
     d['Scarborough-Agincourt'] = round(statistics.mean([d['Steeles'], d['L\'Amoreaux'], d['Tam O\'Shanter-Sullivan']]), 2)
     d['Scarborough North'] = round(statistics.mean([d['Malvern'], d['Agincourt South-Malvern West'], d['Rouge'], d['Milliken'], d['Agincourt North']]), 2)
 
+    fireStationCount = 0
+    breakins = 0
     for add in addressList:
         add = add.replace('—', '-')
-        if add in d:
+        if add in d.keys():
             breakins = d[add]
+        if add in fireStations.keys():
+            fireStationCount = fireStations[add]
 
     risk = breakins/76
     if rented:
@@ -78,30 +129,45 @@ def process(address, rented, house, price):
     apartmentmin['MAX'] = 73
     apartmentmax = 120
     premium = 0
+    diff = 0
+    minPremium = 0
     if house:
         if price < 100000:
-            premium = housemin['100K'] + (housemin['300K'] - housemin['100K']) * risk/5
+            diff = housemin['300K'] - housemin['100K']
+            minPremium = housemin['100K']
+            
         elif price < 300000:
-            premium = housemin['300K'] + (housemin['700K'] - housemin['300K']) * risk/5
+            diff = housemin['700K'] - housemin['300K']
+            minPremium = housemin['300K']
         elif price < 700000:
-            premium = housemin['700K'] + (housemin['1.5M'] - housemin['700K']) * risk/5
+            diff = housemin['1.5M'] - housemin['700K']
+            minPremium = housemin['700K']
         elif price < 1500000:
-            premium = housemin['1.5M'] + (housemin['MAX'] - housemin['1.5M']) * risk/5
+            diff = housemin['MAX'] - housemin['1.5M']
+            minPremium = housemin['1.5M']
         else:
-            premium = housemin['MAX'] + (housemax - housemin['MAX']) * risk/5
+            diff = housemax - housemin['MAX']
+            minPremium = housemin['MAX']
+        premium = minPremium + diff * risk/5 - diff * (fireStationCount - 1)/6
         if rented:
-            premium = premium * 1/3
+            premium = premium * 1/2
     else:
         if price < 100000:
-            premium = apartmentmin['100K'] + (apartmentmin['300K'] - apartmentmin['100K']) * risk/5
+            diff = apartmentmin['300K'] - apartmentmin['100K']
+            minPremium = apartmentmin['100K']
         elif price < 300000:
-            premium = apartmentmin['300K'] + (apartmentmin['700K'] - apartmentmin['300K']) * risk/5
+            diff = apartmentmin['700K'] - apartmentmin['300K']
+            minPremium = apartmentmin['300K']
         elif price < 700000:
-            premium = apartmentmin['700K'] + (apartmentmin['1.5M'] - apartmentmin['700K']) * risk/5
+            diff = apartmentmin['1.5M'] - apartmentmin['700K']
+            minPremium = apartmentmin['700K']
         elif price < 1500000:
-            premium = apartmentmin['1.5M'] + (apartmentmin['MAX'] - apartmentmin['1.5M']) * risk/5
+            diff = apartmentmin['MAX'] - apartmentmin['1.5M']
+            minPremium = apartmentmin['1.5M']
         else:
-            premium = apartmentmin['MAX'] + (apartmentmax - apartmentmin['MAX']) * risk/5
+            diff = apartmentmax - apartmentmin['MAX']
+            minPremium = apartmentmin['MAX']
+        premium = minPremium + diff * risk/5 - diff * (fireStationCount - 1)/6
 
 
     premium = round(premium, 2)
