@@ -1,28 +1,49 @@
 from flask import Flask, render_template, request, jsonify
+import sys
 
 from bs4 import BeautifulSoup
 import requests
 
 app = Flask(__name__)
 
+def do_scrape(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+    address1 = soup.h1.get_text()
+    address2 = soup.h5.get_text()
+    price = soup.h3.get_text()
+    price_nums = int("".join(filter(str.isdigit, price)))
+    rented = price_nums < 10000
+    type = soup.find_all("span", class_="classifier")[3].get_text()
+
+    info = {}
+    info['address'] = address1 + ", " + address2
+    info['price'] = price
+    info['rented'] = "Rent" if rented else "Own"
+    info['type'] = type.capitalize()
+
+    return info
+
+def calc_risk(info){
+    risk = breakins/76
+
+    if rented:
+       risk *= 1.37
+    if house:
+       risk *= 1.42
+    return risk
+}
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
-def do_scrape(url):
-    page = requests.get("https://www.remax.ca/on/toronto-real-estate/23-pharmacy-ave-wp_id248682454-lst")
-    soup = BeautifulSoup(page.content, 'html.parser')
-    all = soup.find_all("h1", class_="address")
-
-    return jsonify([x.prettify() for x in all])
-
 @app.route('/scrape', methods=['POST', 'GET'])
 def result():
     if request.method == 'POST':
-        # return do_scrape(request.form['url'])
-        return render_template('result.html', url=request.form['url'])
+        return render_template('result.html', **do_scrape(request.form['url']))
     else:
-        return render_template('result.html', url='https://www.remax.ca/on/toronto-real-estate/23-pharmacy-ave-wp_id248682454-lst')
+        return "Nope"
 
 if __name__ == '__main__':
  app.run()
