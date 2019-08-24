@@ -46,7 +46,7 @@ def result():
         if 'remax.ca' in url:
             return render_template('result.html', **do_scrape(url))
         else:
-            return render_template('404.html')
+            return render_template('404.html'), 404
     else:
         return redirect("http://127.0.0.1:5000/", code=302)
 
