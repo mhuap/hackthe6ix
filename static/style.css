@@ -1,15 +1,33 @@
-#content {
+#home, #result{
   height: 100vh;
   margin: 0 auto;
-  text-align: center;
   padding: 100px;
+  width: 50%;
+}
+
+#home {
+  text-align: center;
+}
+
+#result p {
+  margin: 0;
 }
 
 form {
-  width: 50%;
   margin: 0 auto;
 }
 
 button {
   margin: 15px 0;
+}
+
+.score {
+  font-size: 3em;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.score p{
+  position: relative;
+  top: 4px;
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Webpage</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel='stylesheet' href='{{ url_for('static', filename='style.css') }}'>
+</head>
+<body>
+    <div id='result'>
+      <h1>Result</h1>
+      <p>{{url}}</p>
+      <ul>
+        <li><strong>Address:</strong> 1234 Fake St</li>
+        <li><strong>Price:</strong> $000,000</li>
+        <li><strong>Type:</strong> House</li>
+        <li><strong>Rent:</strong> No</li>
+      </ul>
+      <hr>
+      <div class='row'>
+        <div class='col-sm-4'>
+          <h5>Risk</h5>
+          <p>
+            <span class='score text-danger'>5</span>
+            out of 5
+          </p>
+          <small>5 is highest risk</small>
+        </div>
+        <div class='col-sm-8'>
+          <h5>Estimated Insurance Premium</h5>
+          <p>
+            > 1.5M : $120 (73 - 120)
+          </p>
+        </div>
+      </div>
+
+    </div>
+</body>
+</html>
