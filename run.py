@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, redirect
 import sys
 
 from bs4 import BeautifulSoup
@@ -42,9 +42,13 @@ def home():
 @app.route('/scrape', methods=['POST', 'GET'])
 def result():
     if request.method == 'POST':
-        return render_template('result.html', **do_scrape(request.form['url']))
+        url = request.form['url']
+        if 'remax.ca' in url:
+            return render_template('result.html', **do_scrape(url))
+        else:
+            return render_template('404.html')
     else:
-        return "Nope"
+        return redirect("http://127.0.0.1:5000/", code=302)
 
 if __name__ == '__main__':
  app.run()
