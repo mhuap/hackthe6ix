@@ -24,7 +24,7 @@ def do_scrape(url):
 
     address = address[:address.index(',') + 1] + ' Toronto, ON'
     price = int(price.replace('$', '').replace(',', ''))
-    house = 'house' in str(type)
+    house = str(type)
 
     return geo.process(address, rented, house, price)
 

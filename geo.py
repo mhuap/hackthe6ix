@@ -4,25 +4,18 @@ import requests
 import json
 import statistics
 
-
-def process(address, rented, house, price):
-    geolocator = Nominatim(user_agent="specify_your_app_name_here")
-    location = geolocator.geocode(address)
-    
-   
-    addressList = location.address.split(', ')
-    d = {}
+d = {}
  
-    with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                line_count += 1
-            else:
-                d[row[1]] = float(row[26])
-                """ print(f'\t{row[1]} is {row[26]}.') """
-                line_count += 1
+with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            line_count += 1
+        else:
+            d[row[1]] = float(row[26])
+            """ print(f'\t{row[1]} is {row[26]}.') """
+            line_count += 1
     
     d['Etobicoke North'] = round(statistics.mean([d['Mount Olive-Silverstone-Jamestown'], d['West Humber-Clairville'], d['Thistletown-Beaumond Heights'], d['Rexdale-Kipling'], d['Elms-Old Rexdale'], d['Kingsview Village-The Westway']]), 2)
     d['Etobicoke Centre'] = round(statistics.mean([d['Willowridge-Martingrove-Richview'], d['Humber Heights-Westmount'], d['Edenbridge-Humber Valley'], d['Princess-Rosethorn'], d['Eringate-Centennial-West Deane'], d['Markland Wood'], d['Etobicoke West Mall'], d['Islington-City Centre West']]), 2)
@@ -36,7 +29,7 @@ def process(address, rented, house, price):
     d['Spadina-Fort York'] = round(statistics.mean([d['Niagara'], d['Waterfront Communities-The Island'], d['Kensington-Chinatown'], d['Bay Street Corridor'], d['Trinity-Bellwoods']]), 2)
     d['Scarborough-Rouge Park'] = round(statistics.mean([d['West Hill'], d['Centennial Scarborough'], d['Rouge'], d['Highland Creek'], d['Malvern']]), 2)
     d['University-Rosedale'] = round(statistics.mean([d['Bay Street Corridor'], d['Kensington-Chinatown'], d['University'], d['Palmerston-Little Italy'], d['Annex'], d['Rosedale-Moore Park']]), 2)
-    d['Toronto-St Paul’s'] = round(statistics.mean([d['Wychwood'], d['Casa Loma'], d['Humewood-Cedarvale'], d['Oakwood Village'], d['Forest Hill South'], d['Yonge-St.Clair'], d['Yonge-Eglinton'], d['Mount Pleasant West']]), 2)
+    d['Toronto-St. Paul\'s'] = round(statistics.mean([d['Wychwood'], d['Casa Loma'], d['Humewood-Cedarvale'], d['Oakwood Village'], d['Forest Hill South'], d['Yonge-St.Clair'], d['Yonge-Eglinton'], d['Mount Pleasant West']]), 2)
     d['Toronto Centre'] = round(statistics.mean([d['Church-Yonge Corridor'], d['Moss Park'], d['Regent Park'], d['Cabbagetown-South St.James Town'], d['North St.James Town']]), 2)
     d['Scarborough-Guildwood'] = round(statistics.mean([d['Guildwood'], d['Scarborough Village'], d['Woburn'], d['West Hill'], d['Morningside']]), 2)
     d['Toronto-Danforth'] = round(statistics.mean([d['Old East York'], d['Danforth East York'], d['Danforth'], d['Greenwood-Coxwell'], d['South Riverdale'], d['North Riverdale'], d['Blake-Jones'], d['Playter Estates-Danforth'], d['Broadview North']]), 2)
@@ -46,10 +39,22 @@ def process(address, rented, house, price):
     d['Willowdale'] = round(statistics.mean([d['Willowdale East'], d['Willowdale West'], d['Lansing-Westgate'], d['Newtonbrook West'], d['Newtonbrook East']]), 2)
     d['Beaches-East York'] = round(statistics.mean([d['The Beaches'], d['East End-Danforth'], d['O\'Connor-Parkview'], d['Taylor-Massey'], d['Woodbine-Lumsden'], d['South Riverdale'], d['Woodbine Corridor'], d['Danforth'], d['Danforth East York'], d['Old East York']]), 2)
     d['Scarborough Southwest'] = round(statistics.mean([d['Scarborough Village'], d['Cliffcrest'], d['Kennedy Park'], d['Birchcliffe-Cliffside'], d['Oakridge'], d['Clairlea-Birchmount']]), 2)
-    d['Scarborough Center'] = round(statistics.mean([d['Dorset Park'], d['Bendale'], d['Eglinton East'], d['Ionview'], d['Wexford/Maryvale']]), 2)
+    d['Scarborough Centre'] = round(statistics.mean([d['Dorset Park'], d['Bendale'], d['Eglinton East'], d['Ionview'], d['Wexford/Maryvale']]), 2)
     d['Scarborough-Agincourt'] = round(statistics.mean([d['Steeles'], d['L\'Amoreaux'], d['Tam O\'Shanter-Sullivan']]), 2)
     d['Scarborough North'] = round(statistics.mean([d['Malvern'], d['Agincourt South-Malvern West'], d['Rouge'], d['Milliken'], d['Agincourt North']]), 2)
 
+
+
+def process(address, rented, type, price):
+    geolocator = Nominatim(user_agent="specify_your_app_name_here")
+    location = geolocator.geocode(address, timeout=30)
+    if 'house' in type:
+        house = True
+    else:
+        house = False
+   
+    addressList = location.address.split(', ')
+    
     for add in addressList:
         add = add.replace('—', '-')
         if add in d:
@@ -105,4 +110,12 @@ def process(address, rented, house, price):
 
 
     premium = round(premium, 2)
-    return risk, premium
+    info = {
+        'address': address,
+        'price': price,
+        'rented': rented,
+        'type': type,
+        'risk': risk,
+        'premium': premium
+    }
+    return info
