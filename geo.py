@@ -5,7 +5,7 @@ import json
 import statistics
 
 d = {}
- 
+
 with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
@@ -16,7 +16,7 @@ with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
             d[row[1]] = float(row[26])
             """ print(f'\t{row[1]} is {row[26]}.') """
             line_count += 1
-    
+
     d['Etobicoke North'] = round(statistics.mean([d['Mount Olive-Silverstone-Jamestown'], d['West Humber-Clairville'], d['Thistletown-Beaumond Heights'], d['Rexdale-Kipling'], d['Elms-Old Rexdale'], d['Kingsview Village-The Westway']]), 2)
     d['Etobicoke Centre'] = round(statistics.mean([d['Willowridge-Martingrove-Richview'], d['Humber Heights-Westmount'], d['Edenbridge-Humber Valley'], d['Princess-Rosethorn'], d['Eringate-Centennial-West Deane'], d['Markland Wood'], d['Etobicoke West Mall'], d['Islington-City Centre West']]), 2)
     d['Etobicoke-Lakeshore'] = round(statistics.mean([d['Islington-City Centre West'], d['Kingsway South'], d['Stonegate-Queensway'], d['Mimico'], d['New Toronto'], d['Long Branch'], d['Alderwood']]), 2)
@@ -45,16 +45,16 @@ with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
 
 
 
-def process(address, rented, type, price):
+def process(address, rented, type, price, description):
     geolocator = Nominatim(user_agent="specify_your_app_name_here")
     location = geolocator.geocode(address, timeout=30)
     if 'house' in type:
         house = True
     else:
         house = False
-   
+
     addressList = location.address.split(', ')
-    
+
     for add in addressList:
         add = add.replace('—', '-')
         if add in d:
@@ -116,6 +116,7 @@ def process(address, rented, type, price):
         'rented': rented,
         'type': type,
         'risk': risk,
-        'premium': premium
+        'premium': premium,
+        'description':description
     }
     return info

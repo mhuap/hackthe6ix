@@ -8,7 +8,7 @@ import requests
 app = Flask(__name__)
 
 def do_scrape(url):
-    page = requests.get(url)
+    page = requests.get(url, verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
     address1 = soup.h1.get_text()
     address2 = soup.h5.get_text()
@@ -33,7 +33,7 @@ def do_scrape(url):
     price = int(price.replace('$', '').replace(',', ''))
     house = str(type)
 
-    return geo.process(address, rented, house, price)
+    return geo.process(address, rented, house, price, description)
 
 @app.route('/')
 def home():
