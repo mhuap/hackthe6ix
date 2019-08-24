@@ -1,0 +1,15 @@
+#content {
+  height: 100vh;
+  margin: 0 auto;
+  text-align: center;
+  padding: 100px;
+}
+
+form {
+  width: 50%;
+  margin: 0 auto;
+}
+
+button {
+  margin: 15px 0;
+}
