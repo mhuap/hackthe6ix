@@ -30,19 +30,19 @@
     </nav>
 
     <div id='result'>
-      <h1>Result</h1>
-      <a id='remax-link' href='{{posting}}' target="_blank">Visit original posting</a>
+      <h1 >{{resultPrompt}}</h1>
+      <a id='remax-link' href='{{posting}}' target="_blank">{{originalPostingPrompt}}</a>
       <div class='row'>
         <div class='col-sm'>
-          <h5>Property Type</h5>
+          <h5>{{propertyTypePrompt}}</h5>
           <p>{{type}} {{rented}}</p>
         </div>
         <div class='col-sm'>
-          <h5>Address</h5>
+          <h5>{{addressPrompt}}</h5>
           <p>{{address}}</p>
         </div>
         <div class='col-sm'>
-          <h5>Price</h5>
+          <h5>{{pricePrompt}}</h5>
           <p>{{price}}</p>
         </div>
       </div>
@@ -50,7 +50,7 @@
 
       <div class='row'>
         <div class='col-sm'>
-          <h5>Description</h5>
+          <h5>{{descriptionPrompt}}</h5>
           <p>
             {{description}}
           </p>
@@ -60,7 +60,7 @@
       <div class='card'>
         <div class='row'>
           <div class='prem col-sm'>
-            <h5>Estimated Insurance Premium</h5>
+            <h5>{{insurancePremiumPrompt}}</h5>
             <p class='score'>
               ${{premium}}
             </p>
@@ -68,47 +68,42 @@
         </div>
         <div class='row'>
           <div class='col-sm'>
-            <h5>Risk of Breaking-and-Entering</h5>
+            <h5>{{breakAndEnterPrompt}}</h5>
             <p>
               <span class='score text-{{riskColor}}'>{{risk}}</span>
-              out of 5
+              {{outOf5}}
               <a tabindex="0" class="text-secondary" data-trigger="focus" data-toggle="popover" data-content="Higher score means higher risk">?</a>
             </p>
             <small>
-              This property is in a {% if risk > 2 %} MEDIUM {% elif risk > 4 %} HIGH {% else %} LOW {% endif %} risk neighbourhood for breaking-and-entering{% if not 2 < risk < 4 %}, which  {%if risk > 4 %} INCREASES {% else %} DECREASES {% endif %} {% endif %}your premium.
+              {{neighbourhood}}
             </small>
           </div>
           <div class='col-sm'>
-            <h5>Rent vs Sale</h5>
+            <h5>{{rentVsSale}}</h5>
             <small>
-              This property is listed as {{ rented.upper() }}. Properties for rent are at higher risk of theft, but enjoy lower insurance premiums due to the landlord’s coverage.
-            </small>
-          </div>
-        </div>
-        <div class='row'>
-          <div class='col-sm'>
-            <h5>Proximity to Fire Stations</h5>
-            <small>
-              This neighbourhood has {{stations}} fire stations. Close proximity to fire stations lowers your insurance premium.
-            </small>
-          </div>
-          <div class='col-sm'>
-            <h5>House/townhouse vs Condo</h5>
-            <small>
-              This property is listed as a {{type.upper()}}.
-              {% if type.upper() == 'HOUSE' or type.upper() == 'TOWNHOUSE'%}
-                Houses and townhouses are at a higher risk of theft, which INCREASES your premium.
-              {% else %}
-              Condos are at a lower risk of theft, which DECREASES your premium.
-              {% endif %}
+              {{isForRent}}
             </small>
           </div>
         </div>
         <div class='row'>
           <div class='col-sm'>
-            <h5>Price</h5>
+            <h5>{{proximity}}</h5>
             <small>
-              Insurance premiums are strongly influenced by the price of the property.
+              {{fireStationsCount}}
+            </small>
+          </div>
+          <div class='col-sm'>
+            <h5>{{houseTownhouseCondo}}</h5>
+            <small>
+              {{houseMessage}}
+            </small>
+          </div>
+        </div>
+        <div class='row'>
+          <div class='col-sm'>
+            <h5>{{pricePrompt}}</h5>
+            <small>
+              {{insurancePremiumInfluence}}
             </small>
           </div>
         </div>
