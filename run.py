@@ -19,6 +19,8 @@ def do_scrape(url):
     description = soup.select('.property-description p.content')[0].get_text()
 
     address = address1 + ", " + address2
+    if not 'Toronto' in address:
+        return False
     if " - " in address:
         address = address[address.index(' - ') + 1:]
 
@@ -36,7 +38,11 @@ def result():
     if request.method == 'POST':
         url = request.form['url']
         if 'remax.ca' in url:
-            return render_template('result.html', **do_scrape(url), posting=url)
+            info = do_scrape(url)
+            if not info:
+                return render_template('404.html'), 404
+            else:
+                return render_template('result.html', **info)
         else:
             return render_template('404.html'), 404
     else:

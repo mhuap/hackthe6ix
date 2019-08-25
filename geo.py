@@ -4,6 +4,36 @@ import requests
 import json
 import statistics
 
+
+geolocator = Nominatim(user_agent="specify_your_app_name_here")
+
+fireStations = {}
+fireStations['Etobicoke North'] = 4
+fireStations['Etobicoke Centre'] = 3
+fireStations['Etobicoke-Lakeshore'] = 5
+fireStations['Parkdale-High Park'] = 5
+fireStations['York South-Weston'] = 3
+fireStations['York Centre'] = 3
+fireStations['Humber River-Black Creek'] = 4
+fireStations['Eglinton-Lawrence'] = 2
+fireStations['Davenport'] = 3
+fireStations['Spadina-Fort York'] = 6
+fireStations['Scarborough-Rouge Park'] = 3
+fireStations['University-Rosedale'] = 4
+fireStations['Toronto-St. Paul\'s'] = 3
+fireStations['Toronto Centre'] = 3
+fireStations['Scarborough-Guildwood'] = 2
+fireStations['Toronto-Danforth'] = 4
+fireStations['Don Valley West'] = 4
+fireStations['Don Valley East'] = 3
+fireStations['Don Valley North'] = 4
+fireStations['Willowdale'] = 1
+fireStations['Beaches-East York'] = 3
+fireStations['Scarborough Southwest'] = 3
+fireStations['Scarborough Centre'] = 2
+fireStations['Scarborough-Agincourt'] = 2
+fireStations['Scarborough North'] = 4
+
 d = {}
 
 with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
@@ -52,26 +82,32 @@ def gen_risk_color(risk):
         return 'danger'
 
 def process(address, rented, type, price, description):
-    geolocator = Nominatim(user_agent="specify_your_app_name_here")
-    location = geolocator.geocode(address, timeout=30)
-    if 'house' in type:
-        house = True
-    else:
-        house = False
 
+    location = geolocator.geocode(address, timeout=30)
+    if location is None:
+        return False
+    house = False if 'condo' in type else True
+    if not 'house' in type and not 'condo' in type:
+        type = "Unknown"
+    security = True if 'security' in description.lower() else False
     addressList = location.address.split(', ')
+    fireStationCount = 0
+    breakins = 0
 
     for add in addressList:
         add = add.replace('—', '-')
-        if add in d:
+        if add in d.keys():
             breakins = d[add]
+        if add in fireStations.keys():
+            fireStationCount = fireStations[add]
 
-    risk = breakins/76
+    risk = breakins/36.4
     if rented:
         risk *= 1.37
     if house:
         risk *= 1.42
-
+    if security:
+        risk *= (2/3)
     risk = round(risk, 2)
     print(risk)
     housemin = {}
@@ -90,31 +126,47 @@ def process(address, rented, type, price, description):
     apartmentmax = 120
     premium = 0
 
+    diff = 0
+    minPremium = 0
+
     price_nums = int("".join(filter(str.isdigit, price)))
     if house:
         if price_nums < 100000:
-            premium = housemin['100K'] + (housemin['300K'] - housemin['100K']) * risk/5
+            diff = housemin['300K'] - housemin['100K']
+            minPremium = housemin['100K']
+
         elif price_nums < 300000:
-            premium = housemin['300K'] + (housemin['700K'] - housemin['300K']) * risk/5
+            diff = housemin['700K'] - housemin['300K']
+            minPremium = housemin['300K']
         elif price_nums < 700000:
-            premium = housemin['700K'] + (housemin['1.5M'] - housemin['700K']) * risk/5
+            diff = housemin['1.5M'] - housemin['700K']
+            minPremium = housemin['700K']
         elif price_nums < 1500000:
-            premium = housemin['1.5M'] + (housemin['MAX'] - housemin['1.5M']) * risk/5
+            diff = housemin['MAX'] - housemin['1.5M']
+            minPremium = housemin['1.5M']
         else:
-            premium = housemin['MAX'] + (housemax - housemin['MAX']) * risk/5
+            diff = housemax - housemin['MAX']
+            minPremium = housemin['MAX']
+        premium = minPremium + diff * risk/5 - diff * (fireStationCount - 1)/6
         if rented:
-            premium = premium * 1/3
+            premium = premium * 1/2
     else:
         if price_nums < 100000:
-            premium = apartmentmin['100K'] + (apartmentmin['300K'] - apartmentmin['100K']) * risk/5
+            diff = apartmentmin['300K'] - apartmentmin['100K']
+            minPremium = apartmentmin['100K']
         elif price_nums < 300000:
-            premium = apartmentmin['300K'] + (apartmentmin['700K'] - apartmentmin['300K']) * risk/5
+            diff = apartmentmin['700K'] - apartmentmin['300K']
+            minPremium = apartmentmin['300K']
         elif price_nums < 700000:
-            premium = apartmentmin['700K'] + (apartmentmin['1.5M'] - apartmentmin['700K']) * risk/5
+            diff = apartmentmin['1.5M'] - apartmentmin['700K']
+            minPremium = apartmentmin['700K']
         elif price_nums < 1500000:
-            premium = apartmentmin['1.5M'] + (apartmentmin['MAX'] - apartmentmin['1.5M']) * risk/5
+            diff = apartmentmin['MAX'] - apartmentmin['1.5M']
+            minPremium = apartmentmin['1.5M']
         else:
-            premium = apartmentmin['MAX'] + (apartmentmax - apartmentmin['MAX']) * risk/5
+            diff = apartmentmax - apartmentmin['MAX']
+            minPremium = apartmentmin['MAX']
+        premium = minPremium + diff * risk/5 - diff * (fireStationCount - 1)/6
 
 
     premium = round(premium, 2)
@@ -126,6 +178,8 @@ def process(address, rented, type, price, description):
         'risk': risk,
         'riskColor': gen_risk_color(risk),
         'premium': premium,
-        'description':description
+        'description': description,
+        'security': security,
+        'stations': fireStationCount
     }
     return info
