@@ -19,7 +19,7 @@
 
 #remax-link {
   position: absolute;
-  top: 150px;
+  top: 175px;
   right: 0;
 }
 
@@ -65,7 +65,7 @@ button {
   text-align: center;
 }
 
-nav a{
+nav a#title{
   font-size: 2rem;
   color: white;
   padding: 1rem;
@@ -76,6 +76,12 @@ nav a:hover {
   text-decoration: none;
 }
 
+nav .dropdown {
+  display: block;
+  position: absolute;
+  right: 50px;
+}
+
 img {
   display: block;
   position: absolute;
@@ -83,4 +89,9 @@ img {
   right: 4rem;;
   z-index: -1;
   width: 60%;
+}
+
+a#back {
+  margin-top: 25px;
+  display: block;
 }

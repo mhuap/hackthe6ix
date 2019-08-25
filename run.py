@@ -31,20 +31,22 @@ def do_scrape(url):
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    language = request.args.get('lang')
+    return render_template('index.html', lang=language)
 
 @app.route('/scrape', methods=['POST', 'GET'])
 def result():
+    language = request.args.get('lang')
     if request.method == 'POST':
         url = request.form['url']
         if 'remax.ca' in url:
             info = do_scrape(url)
             if not info:
-                return render_template('404.html'), 404
+                return render_template('404.html', lang=language), 404
             else:
-                return render_template('result.html', **info, posting=url)
+                return render_template('result.html', **info, posting=url, lang=language)
         else:
-            return render_template('404.html'), 404
+            return render_template('404.html', lang=language), 404
     else:
         return redirect("http://127.0.0.1:5000/", code=302)
 
