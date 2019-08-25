@@ -229,6 +229,9 @@ def process(address, rented, type, price, description, lang):
         'pricePrompt': myTranslate('Price'),
         'insurancePremiumInfluence': myTranslate('Insurance premiums are strongly influenced by the price of the property.'),
         'houseMessage': myTranslate(houseMessage),
-        'houseTownhouseCondo': myTranslate('House/townhouse versus Condo')
+        'houseTownhouseCondo': myTranslate('House/townhouse versus Condo'),
+        'higherScore': myTranslate("A higher score means higher risk"),
+        'checkAnother': myTranslate('Check another property'),
+        'month': myTranslate('month')
     }
     return info
