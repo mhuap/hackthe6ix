@@ -32,11 +32,16 @@ def do_scrape(url):
 @app.route('/')
 def home():
     language = request.args.get('lang')
+    if not language:
+        language = "en"
     return render_template('index.html', lang=language)
 
 @app.route('/scrape', methods=['POST', 'GET'])
 def result():
     language = request.args.get('lang')
+    if not language:
+        language = "en"
+    print(language, file=sys.stderr)
     if request.method == 'POST':
         url = request.form['url']
         if 'remax.ca' in url:
