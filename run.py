@@ -7,7 +7,7 @@ import requests
 
 app = Flask(__name__)
 
-def do_scrape(url):
+def do_scrape(url, lang):
     page = requests.get(url, verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
     address1 = soup.h1.get_text()
@@ -27,7 +27,7 @@ def do_scrape(url):
     address = address[:address.index(',') + 1] + ' Toronto, ON'
     house = str(type)
 
-    return geo.process(address, rented, house, price, description, 'en')
+    return geo.process(address, rented, house, price, description, lang)
 
 @app.route('/')
 def home():
@@ -39,13 +39,14 @@ def home():
 @app.route('/scrape', methods=['POST', 'GET'])
 def result():
     language = request.args.get('lang')
+    print(language)
     if not language:
-        language = "en"
+        language = 'en'
     print(language, file=sys.stderr)
     if request.method == 'POST':
         url = request.form['url']
         if 'remax.ca' in url:
-            info = do_scrape(url)
+            info = do_scrape(url, language)
             if not info:
                 return render_template('404.html', lang=language), 404
             else:
