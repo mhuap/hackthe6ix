@@ -1,16 +1,46 @@
 #home, #result{
-  height: 100vh;
   margin: 0 auto;
-  padding: 100px;
-  width: 65%;
+  width: 50%;
+  padding-top: 150px;
+  padding-bottom: 50px;
 }
 
 #home {
   text-align: center;
 }
 
+#result {
+  position: relative;
+}
+
 #result p {
   margin: 0;
+}
+
+#remax-link {
+  position: absolute;
+  top: 150px;
+  right: 0;
+}
+
+.row, .card {
+  margin-top: 20px;
+}
+
+.card .row {
+  margin: 15px 5px;
+}
+
+.card a {
+  margin-left: 5px;
+  font-size: 1rem;
+  height: 20px;
+  width: 20px;
+  display: inline-block;
+  text-align: center;
+  border-radius: 50%;
+  background: #dae0e5;
+  line-height: 20px;
 }
 
 form {
@@ -22,22 +52,35 @@ button {
 }
 
 .score {
-  font-size: 3em;
+  font-size: 2rem;
   font-weight: bold;
   display: inline-block;
 }
 
-.score p{
-  position: relative;
-  top: 4px;
+.prem .score {
+  font-size: 3rem;
+}
+
+.prem {
+  text-align: center;
+}
+
+nav a{
+  font-size: 2rem;
+  color: white;
+  padding: 1rem;
+}
+
+nav a:hover {
+  color: white;
+  text-decoration: none;
 }
 
 img {
   display: block;
   position: absolute;
-  bottom:0;
-  right: 0;
+  bottom: 1rem;
+  right: 4rem;;
   z-index: -1;
-  width: 75%;
-  margin: -30px;
+  width: 60%;
 }

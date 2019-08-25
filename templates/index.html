@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>My Webpage</title>
+    <title>asteRisk*</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel='stylesheet' href='{{ url_for('static', filename='style.css') }}'>
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-center">
-      <a class="navbar-brand" href="/">Real Estate Risk Assessment</a>
+      <a href="/">asteRisk*</a>
     </nav>
     <div id='home'>
-      <h1>Be informed on the risks you're taking.</h1>
+      <h1>Know the risks you're taking.</h1>
       <p>Learn about your prospective place of residence. Enter the property listing url below and receive a personalized <strong>risk score</strong> and estimated <strong>insurance premium</strong>.</p>
       <form action='/scrape' method="post">
         <input type='text' name='url' class='form-control' placeholder='www.example.com/property'>

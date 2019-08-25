@@ -43,7 +43,13 @@ with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
     d['Scarborough-Agincourt'] = round(statistics.mean([d['Steeles'], d['L\'Amoreaux'], d['Tam O\'Shanter-Sullivan']]), 2)
     d['Scarborough North'] = round(statistics.mean([d['Malvern'], d['Agincourt South-Malvern West'], d['Rouge'], d['Milliken'], d['Agincourt North']]), 2)
 
-
+def gen_risk_color(risk):
+    if risk < 2:
+        return 'success'
+    elif risk < 4:
+        return 'warning'
+    else:
+        return 'danger'
 
 def process(address, rented, type, price, description):
     geolocator = Nominatim(user_agent="specify_your_app_name_here")
@@ -83,27 +89,29 @@ def process(address, rented, type, price, description):
     apartmentmin['MAX'] = 73
     apartmentmax = 120
     premium = 0
+
+    price_nums = int("".join(filter(str.isdigit, price)))
     if house:
-        if price < 100000:
+        if price_nums < 100000:
             premium = housemin['100K'] + (housemin['300K'] - housemin['100K']) * risk/5
-        elif price < 300000:
+        elif price_nums < 300000:
             premium = housemin['300K'] + (housemin['700K'] - housemin['300K']) * risk/5
-        elif price < 700000:
+        elif price_nums < 700000:
             premium = housemin['700K'] + (housemin['1.5M'] - housemin['700K']) * risk/5
-        elif price < 1500000:
+        elif price_nums < 1500000:
             premium = housemin['1.5M'] + (housemin['MAX'] - housemin['1.5M']) * risk/5
         else:
             premium = housemin['MAX'] + (housemax - housemin['MAX']) * risk/5
         if rented:
             premium = premium * 1/3
     else:
-        if price < 100000:
+        if price_nums < 100000:
             premium = apartmentmin['100K'] + (apartmentmin['300K'] - apartmentmin['100K']) * risk/5
-        elif price < 300000:
+        elif price_nums < 300000:
             premium = apartmentmin['300K'] + (apartmentmin['700K'] - apartmentmin['300K']) * risk/5
-        elif price < 700000:
+        elif price_nums < 700000:
             premium = apartmentmin['700K'] + (apartmentmin['1.5M'] - apartmentmin['700K']) * risk/5
-        elif price < 1500000:
+        elif price_nums < 1500000:
             premium = apartmentmin['1.5M'] + (apartmentmin['MAX'] - apartmentmin['1.5M']) * risk/5
         else:
             premium = apartmentmin['MAX'] + (apartmentmax - apartmentmin['MAX']) * risk/5
@@ -113,9 +121,10 @@ def process(address, rented, type, price, description):
     info = {
         'address': address,
         'price': price,
-        'rented': rented,
-        'type': type,
+        'rented': 'For Rent' if rented else 'For Sale',
+        'type': type.capitalize(),
         'risk': risk,
+        'riskColor': gen_risk_color(risk),
         'premium': premium,
         'description':description
     }

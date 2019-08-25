@@ -18,19 +18,11 @@ def do_scrape(url):
     type = soup.find_all("span", class_="classifier")[3].get_text()
     description = soup.select('.property-description p.content')[0].get_text()
 
-    info = {}
-    info['address'] = address1 + ", " + address2
-    info['price'] = price
-    info['rented'] = "Rent" if rented else "Own"
-    info['type'] = type.capitalize()
-    info['description'] = description
-
     address = address1 + ", " + address2
     if " - " in address:
         address = address[address.index(' - ') + 1:]
 
     address = address[:address.index(',') + 1] + ' Toronto, ON'
-    price = int(price.replace('$', '').replace(',', ''))
     house = str(type)
 
     return geo.process(address, rented, house, price, description)
@@ -44,7 +36,7 @@ def result():
     if request.method == 'POST':
         url = request.form['url']
         if 'remax.ca' in url:
-            return render_template('result.html', **do_scrape(url))
+            return render_template('result.html', **do_scrape(url), posting=url)
         else:
             return render_template('404.html'), 404
     else:
