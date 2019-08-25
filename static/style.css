@@ -65,7 +65,7 @@ button {
   text-align: center;
 }
 
-nav a{
+nav a#title{
   font-size: 2rem;
   color: white;
   padding: 1rem;
@@ -74,6 +74,12 @@ nav a{
 nav a:hover {
   color: white;
   text-decoration: none;
+}
+
+nav .dropdown {
+  display: block;
+  position: absolute;
+  right: 50px;
 }
 
 img {
