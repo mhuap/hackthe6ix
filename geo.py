@@ -3,9 +3,10 @@ import csv
 import requests
 import json
 import statistics
+import boto3
 
+client = boto3.client('translate')
 
-geolocator = Nominatim(user_agent="specify_your_app_name_here")
 
 fireStations = {}
 fireStations['Etobicoke North'] = 4
@@ -81,7 +82,20 @@ def gen_risk_color(risk):
     else:
         return 'danger'
 
-def process(address, rented, type, price, description):
+def process(address, rented, type, price, description, lang):
+
+    def myTranslate(text):
+        if lang == 'en':
+            return text
+        response = client.translate_text(
+            Text=text,
+            SourceLanguageCode='en',
+            TargetLanguageCode=lang
+        )
+        return response['TranslatedText']
+
+
+    geolocator = Nominatim(user_agent="specify_your_app_name_here")
 
     location = geolocator.geocode(address, timeout=30)
     if location is None:
@@ -168,18 +182,53 @@ def process(address, rented, type, price, description):
             minPremium = apartmentmin['MAX']
         premium = minPremium + diff * risk/5 - diff * (fireStationCount - 1)/6
 
-
+    if risk <= 2:
+        neighbourhood = 'This property is in a LOW risk neighbourhood for breaking-and-entering, which DECREASES your insurance premium.'
+    elif risk <= 4:
+        neighbourhood = 'This property is in a MEDIUM risk neighbourhood for breaking-and-entering.'
+    else:
+        neighbourhood = 'This property is in a HIGH risk neighbourhood for breaking-and-entering, which INCREASES your insurance premium.'
+    if rented:
+        rentMessage = 'This property is listed as FOR RENT. Properties for rent are at higher risk of theft, but enjoy lower insurance premiums due to the landlord’s coverage.'
+    else:
+        rentMessage = 'This property is listed as FOR SALE. Properties for rent are at higher risk of theft, but enjoy lower insurance premiums due to the landlord’s coverage.'
+    
+    fireStationsMessage = 'This neighbourhood has ' + str(fireStationCount) + ' fire stations. Close proximity to fire stations lowers your insurance premium.'
+    if 'house' in type:
+        houseMessage = 'This property is listed as a ' + type.upper() + '. Houses and townhouses are at a higher risk of theft, which INCREASES your premium.'
+    elif 'condo' in type:
+        houseMessage = 'This property is listed as a CONDO. Condos are at a lower risk of theft, which DECREASES your premium.'
+    else:
+        houseMessage = 'Could not determine the type of this property.'
     premium = round(premium, 2)
     info = {
         'address': address,
         'price': price,
-        'rented': 'For Rent' if rented else 'For Sale',
-        'type': type.capitalize(),
+        'rented': myTranslate('For Rent' if rented else 'For Sale'),
+        'type': myTranslate(type.capitalize()),
         'risk': risk,
         'riskColor': gen_risk_color(risk),
         'premium': premium,
-        'description': description,
+        'description': myTranslate(description),
         'security': security,
-        'stations': fireStationCount
+        'stations': fireStationCount,
+        'resultPrompt': myTranslate('Result'),
+        'propertyTypePrompt': myTranslate('Property Type'),
+        'originalPostingPrompt': myTranslate('Visit original posting'),
+        'addressPrompt': myTranslate('Address'),
+        'pricePrompt': myTranslate('Price'),
+        'descriptionPrompt': myTranslate('Description'),
+        'insurancePremiumPrompt': myTranslate('Estimated Insurance Premium'),
+        'breakAndEnterPrompt': myTranslate('Risk of Breaking-and-Entering'),
+        'outOf5': myTranslate('out of 5'),
+        'neighbourhood': myTranslate(neighbourhood),
+        'rentVsSale': myTranslate('Rent versus Sale'),
+        'isForRent': myTranslate(rentMessage),
+        'proximity': myTranslate('Proximity to Fire Stations'),
+        'fireStationsCount': myTranslate(fireStationsMessage),
+        'pricePrompt': myTranslate('Price'),
+        'insurancePremiumInfluence': myTranslate('Insurance premiums are strongly influenced by the price of the property.'),
+        'houseMessage': myTranslate(houseMessage),
+        'houseTownhouseCondo': myTranslate('House/townhouse versus Condo')
     }
     return info
