@@ -27,7 +27,7 @@ def do_scrape(url):
     address = address[:address.index(',') + 1] + ' Toronto, ON'
     house = str(type)
 
-    return geo.process(address, rented, house, price, description)
+    return geo.process(address, rented, house, price, description, 'en')
 
 @app.route('/')
 def home():
