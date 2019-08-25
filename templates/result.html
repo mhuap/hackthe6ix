@@ -72,7 +72,7 @@
             <p>
               <span class='score text-{{riskColor}}'>{{risk}}</span>
               {{outOf5}}
-              <a tabindex="0" class="text-secondary" data-trigger="focus" data-toggle="popover" data-content="Higher score means higher risk">?</a>
+              <a tabindex="0" class="text-secondary" data-trigger="focus" data-toggle="popover" data-content="{{higherScore}}">?</a>
             </p>
             <small>
               {{neighbourhood}}
@@ -108,7 +108,7 @@
           </div>
         </div>
       </div>
-      <a id='back' href='/?lang={{lang}}' class='text-primary'>< Check another property</a>
+      <a id='back' href='/?lang={{lang}}' class='text-primary'>< {{checkAnother}}</a>
 
     </div>
 </body>
