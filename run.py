@@ -42,7 +42,7 @@ def result():
             if not info:
                 return render_template('404.html'), 404
             else:
-                return render_template('result.html', **info)
+                return render_template('result.html', **info, posting=url)
         else:
             return render_template('404.html'), 404
     else:
