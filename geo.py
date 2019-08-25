@@ -76,10 +76,12 @@ with open('Neighbourhood_Crime_Rates_Boundary_File_.csv') as csv_file:
 def process(address, rented, type, price, description):
     
     location = geolocator.geocode(address, timeout=30)
-    
-    house = True if 'house' in type else False
+    if location is None:
+        return False
+    house = False if 'condo' in type else True
+    if not 'house' in type and not 'condo' in type:
+        type = "Unknown"
     security = True if 'security' in description.lower() else False
-
     addressList = location.address.split(', ')
     fireStationCount = 0
     breakins = 0
@@ -91,7 +93,7 @@ def process(address, rented, type, price, description):
         if add in fireStations.keys():
             fireStationCount = fireStations[add]
 
-    risk = breakins/76
+    risk = breakins/36.4
     if rented:
         risk *= 1.37
     if house:
@@ -164,7 +166,8 @@ def process(address, rented, type, price, description):
         'type': type,
         'risk': risk,
         'premium': premium,
-        'description':description
-        'security': security
+        'description': description,
+        'security': security,
+        'stations': fireStationCount
     }
     return info
