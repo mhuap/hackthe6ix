@@ -231,7 +231,7 @@ def process(address, rented, type, price, description, lang):
         'houseMessage': myTranslate(houseMessage),
         'houseTownhouseCondo': myTranslate('House/townhouse versus Condo'),
         'higherScore': myTranslate("A higher score means higher risk"),
-        'checkAnother': myTranslate('Check another property')
-
+        'checkAnother': myTranslate('Check another property'),
+        'month': myTranslate('month')
     }
     return info
